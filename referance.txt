@@ -1,8 +1,57 @@
-books = []  #book list
+1---books = []
+A list that stores all books.
+Each book is stored as a dictionary.
 
+-----------------------------------------------------------------------
 
+2---Book Dictionary Structure
+book = {
+    "acc": acc,
+    "isbn": isbn,
+    "title": title,
+    "author": author,
+    "publisher": publisher,
+    "year": year,
+    "category": category,
+    "copies": copies_total,
+    "available": copies_total
+}
 
-add_book function
+------------------------------------------------------------------------
 
+3---Function Overview
 
+add_book()
+      Purpose: Add a new book to the library.
+      Takes input from user
+      Uses .strip() → removes extra spaces
+      Uses .title() → capitalizes first letter of words
+      Stores data in a dictionary
 
+display_books()
+      Purpose: Show all books in the library.
+      Checks if library is empty
+      Uses enumerate() to number books
+      Displays all book details clearly
+
+update_book()
+      Purpose: Modify existing book details.
+      Displays all books
+      User selects a book number
+
+delete_book()
+      Purpose: Remove a book from the library.
+      Displays books
+      User selects book number
+      Uses pop() to delete
+      Shows confirmation message
+
+--------------------------------------------------------------------------
+main_menu()
+      Purpose: Control the entire program flow.
+      Menu Options:
+      0 : Exit
+      1 : Add Book
+      2 : Display All Books
+      3 : Update Book
+      4 : Delete Book
