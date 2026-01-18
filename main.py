@@ -1,4 +1,7 @@
 books = []#list
+members = []        # List of member dictionaries
+issued_books = set()  # Set of issued book accession numbers
+transactions = []  
 
 def add_book():
     #title can capital first letter of word
@@ -91,11 +94,75 @@ def delete_book():
         print("Invalid Book No.\n")
 
 
+#Search Function 
+def search_books():
+    if not books:
+        print("No books in library.\n")
+        return
+
+    print("""
+Search By:
+1 : Title
+2 : Author
+3 : Accession Number
+4 : ISBN
+5 : Publisher
+6 : Category
+""")
+    choice = input("Enter your choice: ").strip()
+    keyword = input("Enter keyword to search: ").strip().lower()
+
+    field_map = {
+        "1": "title",
+        "2": "author",
+        "3": "acc",
+        "4": "isbn",
+        "5": "publisher",
+        "6": "category"
+    }
+
+    if choice not in field_map:
+        print("Invalid choice.\n")
+        return
+
+    field = field_map[choice]
+
+    results = []
+    for book in books:
+        if keyword in book[field].lower():
+            results.append(book)
+
+    if not results:
+        print("No books found.\n")
+    else:
+        print(f"\nFound {len(results)} book(s):")
+        for i, book in enumerate(results, start=1):
+            print(f"{i}. {book['title']} by {book['author']} (Available: {book['available']})")
+
+
+#Member Functions
+def add_member():
+    name = input("Member Name: ").strip().title()
+    member_id = input("Member ID: ").strip()
+    member = {"name": name, "id": member_id}
+    members.append(member)
+    print(f"Member '{name}' added successfully!\n")
+
 
 # --- Main Menu ---
 def main_menu():
     while True:
-        print("0 : Exit\n1 : Add Book\n2 : Display All Books\n3 : Update Book\n4 : Delete Book")
+        print("""
+0 : Exit
+1 : Add Book
+2 : Display All Books
+3 : Update Book
+4 : Delete Book
+5 : Search Books
+6 : Add Member
+7 : Issue Book
+8 : Return Book
+""")
         choice = input("Enter your choice: ").strip()
         if choice == '0':
             break
@@ -107,6 +174,14 @@ def main_menu():
             update_book()
         elif choice == '4':
             delete_book()
+        elif choice == '5':
+            search_books()
+        elif choice == '6':
+            add_member()
+        #elif choice == '7':
+            #issue_book()
+        #elif choice == '8':
+            #return_book()
         else:
             print("Invalid choice.\n")
 
