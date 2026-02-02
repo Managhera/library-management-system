@@ -101,43 +101,56 @@ def search_books():
         return
 
     print("""
-Search By:
-1 : Title
-2 : Author
-3 : Accession Number
-4 : ISBN
-5 : Publisher
-6 : Category
+Search Book By:
+1. Title
+2. Author
+3. Accession Number
+4. ISBN
+5. Publisher
+6. Category
 """)
-    choice = input("Enter your choice: ").strip()
-    keyword = input("Enter keyword to search: ").strip().lower()
 
-    field_map = {
-        "1": "title",
-        "2": "author",
-        "3": "acc",
-        "4": "isbn",
-        "5": "publisher",
-        "6": "category"
-    }
+    choice = input("Enter choice: ").strip()
 
-    if choice not in field_map:
+    if choice == "1":
+        key = input("Enter Title: ").strip().lower()
+    elif choice == "2":
+        key = input("Enter Author Name: ").strip().lower()
+    elif choice == "3":
+        key = input("Enter Accession Number: ").strip().lower()
+    elif choice == "4":
+        key = input("Enter ISBN: ").strip().lower()
+    elif choice == "5":
+        key = input("Enter Publisher Name: ").strip().lower()
+    elif choice == "6":
+        key = input("Enter Category: ").strip().strip().lower()
+    else:
         print("Invalid choice.\n")
         return
 
-    field = field_map[choice]
+    found = False
 
-    results = []
     for book in books:
-        if keyword in book[field].lower():
-            results.append(book)
+        if (
+            (choice == "1" and key in book["title"].lower()) or
+            (choice == "2" and key in book["author"].lower()) or
+            (choice == "3" and key == book["acc"].lower()) or
+            (choice == "4" and key == book["isbn"].lower()) or
+            (choice == "5" and key in book["publisher"].lower()) or
+            (choice == "6" and key in book["category"].lower())
+        ):
+            print("\n--- Book Found ---")
+            print("Title     :", book["title"])
+            print("Author    :", book["author"])
+            print("Acc No    :", book["acc"])
+            print("ISBN      :", book["isbn"])
+            print("Category  :", book["category"])
+            print("Available :", book["available"])
+            found = True
 
-    if not results:
-        print("No books found.\n")
-    else:
-        print(f"\nFound {len(results)} book(s):")
-        for i, book in enumerate(results, start=1):
-            print(f"{i}. {book['title']} by {book['author']} (Available: {book['available']})")
+    if not found:
+        print("No book found.\n")
+
 
 
 #Member Functions
@@ -148,7 +161,76 @@ def add_member():
     members.append(member)
     print(f"Member '{name}' added successfully!\n")
 
+def issue_book():
+    display_books()
 
+    acc = input("Enter Accession Number: ").strip()
+
+    # find book
+    book = None
+    for b in books:
+        if b["acc"] == acc:
+            book = b
+            break
+
+    if book is None:
+        print("Book not found.\n")
+        return
+
+    if book["available"] <= 0:
+        print("Book not available.\n")
+        return
+
+    member_id = input("Enter Member ID: ").strip()
+
+    # check member
+    member_found = False
+    for m in members:
+        if m["id"] == member_id:
+            member_found = True
+            break
+
+    if not member_found:
+        print("Member not found.\n")
+        return
+
+    # issue book
+    book["available"] -= 1
+    issued_books.add(acc)
+
+    transactions.append({
+        "action": "issue",
+        "acc": acc,
+        "member_id": member_id
+    })
+
+    print(f"Book '{book['title']}' issued successfully!\n")
+
+
+
+def return_book():
+    acc = input("Enter Accession Number of the book to return: ").strip()
+    if acc in issued_books:
+        book = None
+        for b in books:
+            if b["acc"] == acc:
+                book = b
+                break
+        if book:
+            book["available"] += 1
+            issued_books.remove(acc)
+            member_id = input("Enter Member ID: ").strip()
+            transactions.append({
+                "action": "return",
+                "acc": acc,
+                "member_id": member_id
+            })
+            print(f"Book '{book['title']}' returned by Member ID '{member_id}'\n")
+    else:
+        print("Book not issued.\n")
+
+
+        
 # --- Main Menu ---
 def main_menu():
     while True:
@@ -178,10 +260,10 @@ def main_menu():
             search_books()
         elif choice == '6':
             add_member()
-        #elif choice == '7':
-            #issue_book()
-        #elif choice == '8':
-            #return_book()
+        elif choice == '7':
+            issue_book()
+        elif choice == '8':
+            return_book()
         else:
             print("Invalid choice.\n")
 
