@@ -3,6 +3,10 @@ members = []        # List of member dictionaries
 issued_books = set()  # Set of issued book accession numbers
 transactions = []  
 
+roles = {
+    "admin": {"password": "admin123"}
+}
+
 def add_book():
     #title can capital first letter of word
     #strip used remove extaa space
@@ -157,93 +161,61 @@ Search Book By:
 def add_member():
     name = input("Member Name: ").strip().title()
     member_id = input("Member ID: ").strip()
+
+    # Prevent duplicate member ID
+    if any(m['id'] == member_id for m in members):
+        print("Member ID already exists.\n")
+        return
+
     member = {"name": name, "id": member_id}
     members.append(member)
     print(f"Member '{name}' added successfully!\n")
 
-def issue_book():
+def issue_book_member(member_id):
     display_books()
-
     acc = input("Enter Accession Number: ").strip()
 
-    # find book
-    book = None
-    for b in books:
-        if b["acc"] == acc:
-            book = b
-            break
-
-    if book is None:
+    book = next((b for b in books if b["acc"] == acc), None)
+    if not book:
         print("Book not found.\n")
         return
-
     if book["available"] <= 0:
         print("Book not available.\n")
         return
 
-    member_id = input("Enter Member ID: ").strip()
-
-    # check member
-    member_found = False
-    for m in members:
-        if m["id"] == member_id:
-            member_found = True
-            break
-
-    if not member_found:
-        print("Member not found.\n")
-        return
-
-    # issue book
     book["available"] -= 1
     issued_books.add(acc)
-
-    transactions.append({
-        "action": "issue",
-        "acc": acc,
-        "member_id": member_id
-    })
-
+    transactions.append({"action": "issue", "acc": acc, "member_id": member_id})
     print(f"Book '{book['title']}' issued successfully!\n")
 
 
 
-def return_book():
-    acc = input("Enter Accession Number of the book to return: ").strip()
+def return_book_member(member_id):
+    acc = input("Enter Accession Number to return: ").strip()
     if acc in issued_books:
-        book = None
-        for b in books:
-            if b["acc"] == acc:
-                book = b
-                break
+        book = next((b for b in books if b["acc"] == acc), None)
         if book:
             book["available"] += 1
             issued_books.remove(acc)
-            member_id = input("Enter Member ID: ").strip()
-            transactions.append({
-                "action": "return",
-                "acc": acc,
-                "member_id": member_id
-            })
-            print(f"Book '{book['title']}' returned by Member ID '{member_id}'\n")
+            transactions.append({"action": "return", "acc": acc, "member_id": member_id})
+            print(f"Book '{book['title']}' returned successfully.\n")
     else:
-        print("Book not issued.\n")
+        print("This book is not issued.\n")
 
 
-        
-# --- Main Menu ---
-def main_menu():
+
+
+def admin_menu():
     while True:
         print("""
-0 : Exit
+Admin Menu:
 1 : Add Book
 2 : Display All Books
 3 : Update Book
 4 : Delete Book
 5 : Search Books
 6 : Add Member
-7 : Issue Book
-8 : Return Book
+0 : Logout
 """)
         choice = input("Enter your choice: ").strip()
         if choice == '0':
@@ -260,11 +232,53 @@ def main_menu():
             search_books()
         elif choice == '6':
             add_member()
-        elif choice == '7':
-            issue_book()
-        elif choice == '8':
-            return_book()
         else:
             print("Invalid choice.\n")
 
-main_menu()
+def member_menu(member_id):
+    while True:
+        print(f"""
+Member Menu (ID: {member_id}):
+1 : Search Books
+2 : Issue Book
+3 : Return Book
+0 : Logout
+""")
+        choice = input("Enter your choice: ").strip()
+        if choice == '0':
+            break
+        elif choice == '1':
+            search_books()
+        elif choice == '2':
+            issue_book_member(member_id)
+        elif choice == '3':
+            return_book_member(member_id)
+        else:
+            print("Invalid choice.\n")
+
+
+
+# --- Main Menu ---
+def login():
+    while True:
+        print("Library Management System")
+        role = input("Login as (admin/member/exit): ").strip().lower()
+        if role == "exit":
+            break
+        elif role == "admin":
+            password = input("Enter admin password: ").strip()
+            if password == roles["admin"]["password"]:
+                admin_menu()
+            else:
+                print("Wrong password.\n")
+        elif role == "member":
+            member_id = input("Enter your Member ID: ").strip()
+            if any(m["id"] == member_id for m in members):
+                member_menu(member_id)
+            else:
+                print("Member not found. Contact admin.\n")
+        else:
+            print("Invalid role.\n")
+
+
+login()
