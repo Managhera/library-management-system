@@ -1,0 +1,51 @@
+{% extends "base.html" %}
+{% block title %}Login{% endblock %}
+{% block content %}
+<main class="login-wrap">
+  <section class="login-card">
+    <aside class="login-info">
+      <h2 style="margin-top:0;">Welcome</h2>
+      <p>Login as Admin or Member to continue.</p>
+      <p><strong>Admin password:</strong> admin123</p>
+      <p><strong>Member sample:</strong> 101</p>
+    </aside>
+    <form class="login-form" method="POST">
+      <h3 style="margin-top:0;">Sign In</h3>
+      <div class="form-grid">
+        <div class="field full">
+          <label for="role">Role</label>
+          <select name="role" id="role" required>
+            <option value="admin">Admin</option>
+            <option value="member">Member</option>
+          </select>
+        </div>
+        <div class="field full" id="memberIdWrap">
+          <label for="user_id">Member ID</label>
+          <input type="text" name="user_id" id="user_id" placeholder="Enter member ID">
+        </div>
+        <div class="field full">
+          <label for="password">Password</label>
+          <input type="password" name="password" id="password" placeholder="Enter password">
+        </div>
+      </div>
+      <button type="submit" style="margin-top:12px;">Login</button>
+    </form>
+  </section>
+</main>
+<script>
+  const role = document.getElementById("role");
+  const memberIdWrap = document.getElementById("memberIdWrap");
+  const memberInput = document.getElementById("user_id");
+  const passwordInput = document.getElementById("password");
+
+  function updateFields() {
+    const isMember = role.value === "member";
+    memberIdWrap.style.display = isMember ? "flex" : "none";
+    memberInput.required = isMember;
+    passwordInput.required = !isMember;
+  }
+
+  role.addEventListener("change", updateFields);
+  updateFields();
+</script>
+{% endblock %}

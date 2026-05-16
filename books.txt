@@ -1,0 +1,1 @@
+{"acc": "101", "title": "New Book", "author": "My Author", "category": "New Leo", "copies": 10, "available": 10}

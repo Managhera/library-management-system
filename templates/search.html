@@ -1,0 +1,40 @@
+{% extends "base.html" %}
+{% block title %}Search Books{% endblock %}
+{% block content %}
+<main class="container">
+  <section class="card form-card">
+    <h2 style="margin-top:0;">Search Books</h2>
+    <form method="POST" class="actions" style="margin-top:12px;">
+      <input class="full" style="flex:1;" name="key" placeholder="Search by title" required>
+      <button type="submit">Search</button>
+    </form>
+
+    {% if result %}
+    <div class="table-wrap" style="margin-top:16px;">
+      <table>
+        <thead>
+          <tr>
+            <th>Title</th>
+            <th>Author</th>
+            <th>Category</th>
+            <th>Available</th>
+          </tr>
+        </thead>
+        <tbody>
+          {% for b in result %}
+          <tr>
+            <td>{{ b.title }}</td>
+            <td>{{ b.author }}</td>
+            <td>{{ b.category }}</td>
+            <td>{{ b.available }}</td>
+          </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+    {% elif request.method == "POST" %}
+    <p class="muted" style="margin-top:12px;">No books matched your search.</p>
+    {% endif %}
+  </section>
+</main>
+{% endblock %}
